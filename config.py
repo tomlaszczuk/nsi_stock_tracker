@@ -14,14 +14,20 @@ class Config:
 
 class DevelopmentConfig(Config):
 	DEBUG = True
+	SQL_ALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
+
+class PythonAnywhereConfig(Config):
+    DEBUG = True
+    SQL_ALCHEMY_DATABASE_URI = os.environ.get('PA_DATABASE_URL')
 
 
 class TestingConfig(Config):
 	TESTING = True
+	SQL_ALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
 
 
 class ProductionConfig(Config):
-	pass
+	SQL_ALCHEMY_DATABASE_URI = os.environ.get('SQL_ALCHEMY_DATABASE_URI')
 
 
 config = {
