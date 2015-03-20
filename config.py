@@ -14,26 +14,26 @@ class Config:
 
 class DevelopmentConfig(Config):
 	DEBUG = True
-	SQL_ALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
+	SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
 
 class PythonAnywhereConfig(Config):
     DEBUG = True
-    SQL_ALCHEMY_DATABASE_URI = os.environ.get('PA_DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'pa_db.sqlite3')
 
 
 class TestingConfig(Config):
 	TESTING = True
-	SQL_ALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
+	SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
 
 
 class ProductionConfig(Config):
-	SQL_ALCHEMY_DATABASE_URI = os.environ.get('SQL_ALCHEMY_DATABASE_URI')
+	SQLALCHEMY_DATABASE_URI = os.environ.get('SQL_ALCHEMY_DATABASE_URI')
 
 
 config = {
 	'development': DevelopmentConfig,
 	'testing': TestingConfig,
 	'production': ProductionConfig,
-
+	'python_anywhere': PythonAnywhereConfig,
 	'default': DevelopmentConfig
 }
