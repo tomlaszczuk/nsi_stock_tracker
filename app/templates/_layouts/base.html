@@ -16,7 +16,7 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="#">Strona główna</a></li>
+                <li><a href="{{ url_for('main.index') }}">Strona główna</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated() %}
@@ -28,12 +28,12 @@
             </ul>
         </div>
     </div>
-</div>	
+</div>
 {% endblock %}
 {% block content %}
 <div class="container">
     {% for category, message in get_flashed_messages(with_categories=true) %}
-    <div class="alert alert-{% if not category=='message' %}{{ category }}{% else %}{{ warning }}">
+    <div class="alert alert-{{ category }}">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         {{ message }}
     </div>

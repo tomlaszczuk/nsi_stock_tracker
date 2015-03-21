@@ -7,8 +7,13 @@
 	<div class="page-header">
 		<h1>Zaloguj się</h1>
 	</div>
-	<div class="col-md-4">
-		{% wtf.quick_form(form) %}
+	<div class="row">
+    	<div class="col-md-4">
+    		{{ wtf.quick_form(form) }}
+    	</div>
 	</div>
-	<p><a href="#">Nie pamiętasz hasła?</a> | <a href="#">Nie masz konta?</a></p>
+	<div class="row">
+	    <p><a href="#">Nie pamiętasz hasła?</a> | <a href="#">Nie masz konta?</a></p>
+	    <p>{{ env }}</p>
+	</div
 {% endblock %}
