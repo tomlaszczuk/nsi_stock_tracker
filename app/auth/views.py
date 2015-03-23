@@ -21,6 +21,6 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
-	logout_user()
-	flash('Wylogowano', 'info')
-	return redirect(url_for('auth.login'))
+    logout_user()
+    flash('Wylogowano', 'info')
+    return redirect(url_for('auth.login'))
