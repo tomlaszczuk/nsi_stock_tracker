@@ -1,0 +1,16 @@
+{% extends "_layouts/base.html" %}
+{% block title %}{{ super() }} | Niezatwierdzeni{% endblock %}
+{% block page_content %}
+    <div class="page-header">
+        <h1>Oczekujący na zatwierdzenie</h1>
+    </div>
+    <ul class="list-group">
+        {% for user in  unconfirmed %}
+            <li class="list-group-item">
+                <a href="{{ url_for('auth.confirm', id=user.id) }}">{{ user.username }} | &lt;{{ user.email }}&gt;</a>
+            </li>
+        {% else %}
+            <p>Wszyscy zatwierdzeni. Dobra robota</p>
+        {% endfor %}
+    </ul>
+{% endblock %}

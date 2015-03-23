@@ -1,0 +1,1 @@
+Zarejestrowano nowego użytkownika o loginie {{ username }}

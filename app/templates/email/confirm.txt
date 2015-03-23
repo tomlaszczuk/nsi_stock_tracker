@@ -1,0 +1,3 @@
+Konto zostało zatwierdzone
+Możesz się zalogować, klikając w poniższy link
+{{ url_for('auth.login', _external=True) }}

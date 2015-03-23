@@ -1,0 +1,17 @@
+{% extends "_layouts/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}{{ super() }} | Rejestracja {% endblock %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h1>Rejestracja konta</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+    <div class="row">
+        <p>Masz już konto? <a href="{{ url_for('auth.login') }}">Zaloguj się</a></p>
+    </div>
+{% endblock %}

@@ -13,7 +13,7 @@
     	</div>
 	</div>
 	<div class="row">
-	    <p><a href="#">Nie pamiętasz hasła?</a> | <a href="#">Nie masz konta?</a></p>
+	    <p><a href="#">Nie pamiętasz hasła?</a> | <a href="{{ url_for('auth.register') }}">Nie masz konta?</a></p>
 	    <p>{{ env }}</p>
 	</div
 {% endblock %}

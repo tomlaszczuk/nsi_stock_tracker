@@ -17,13 +17,16 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('main.index') }}">Strona główna</a></li>
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('auth.unconfirmed_users_list') }}">Zatwierdź użytkowników</a></li>
+                {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated() %}
                 <li><a href="{{ url_for('auth.logout') }}">Wyloguj</a></li>
                 {% else %}
                 <li><a href="{{ url_for('auth.login') }}">Zaloguj</a></li>
-                <li><a href="#">Zarejestruj się</a></li>
+                <li><a href="{{ url_for('auth.register') }}">Zarejestruj się</a></li>
                 {% endif %}
             </ul>
         </div>
