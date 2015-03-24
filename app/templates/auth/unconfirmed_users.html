@@ -7,10 +7,15 @@
     <ul class="list-group">
         {% for user in  unconfirmed %}
             <li class="list-group-item">
-                <a href="{{ url_for('auth.confirm', id=user.id) }}">{{ user.username }} | &lt;{{ user.email }}&gt;</a>
+                {{ user.username }} | &lt;{{ user.email }}&gt; <a href="{{ url_for('auth.confirm', id=user.id) }}" class="label label-info">Zatwierdź</a>
             </li>
         {% else %}
             <p>Wszyscy zatwierdzeni. Dobra robota</p>
         {% endfor %}
     </ul>
+    <div class="row">
+    {% if unconfirmed %}
+        <a href="{{ url_for('auth.confirm_all_users') }}" class="btn btn-warning">Zatwierdź wszystkich</a>
+    {% endif %}
+    </div>
 {% endblock %}

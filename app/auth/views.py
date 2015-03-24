@@ -1,6 +1,7 @@
 from flask import (render_template, redirect, url_for,
                    request, flash, current_app)
-from flask.ext.login import (login_required, login_user, logout_user)
+from flask.ext.login import (login_required, login_user, logout_user,
+                             current_user)
 from . import auth
 from .forms import LoginForm, RegistrationForm
 from ..models import User
@@ -46,21 +47,24 @@ def register():
                   username=u.username)
 
         flash('Konto zostało zarejestrowane. Zostaniesz powiadomiony/a o '
-              'potwierdzeniu przez administratora wiadomością malową',
+              'potwierdzeniu przez administratora wiadomością malową. '
+              'Do aktywacji konta korzystanie z aplikacji nie będzie '
+              'możliwe',
               'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
 
 
-@auth.route('/unconfirmed')
+@auth.route('/admin/unconfirmed')
 @login_required
 @admin_required
 def unconfirmed_users_list():
     unconfirmed = User.query.filter_by(confirmed=False).all()
-    return render_template('auth/unconfirmed.html', unconfirmed=unconfirmed)
+    return render_template('auth/unconfirmed_users.html',
+                           unconfirmed=unconfirmed)
 
 
-@auth.route('/confirm/<int:id>')
+@auth.route('/admin/confirm/<int:id>')
 @login_required
 @admin_required
 def confirm(id):
@@ -71,3 +75,34 @@ def confirm(id):
     send_mail(to=user.email, subject='Konto zatwiedzone',
               template='email/confirm')
     return redirect(url_for('auth.unconfirmed_users_list'))
+
+
+@auth.route('/admin/confirm_all')
+@login_required
+@admin_required
+def confirm_all_users():
+    unconfirmed = User.query.filter_by(confirmed=False).all()
+    for user in unconfirmed:
+        user.confirmed = True
+        db.session.add(user)
+        db.session.commit()
+        send_mail(to=user.email, subject='Konto zatwiedzone',
+                  template='email/confirm')
+    flash('Operacja zakończona powodzeniem', 'success')
+    return redirect(url_for('auth.unconfirmed_users_list'))
+
+
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated() and not current_user.confirmed \
+            and request.endpoint[:5] != 'auth.':
+        return redirect(url_for('auth.unconfirmed'))
+
+
+@auth.route('/unconfirmed')
+@login_required
+def unconfirmed():
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+    admin = current_app.config['ADMIN_EMAIL']
+    return render_template('auth/unconfirmed_message.html', admin=admin)
