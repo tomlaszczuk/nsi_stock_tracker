@@ -4,7 +4,8 @@ from flask.ext.login import (login_required, login_user, logout_user,
                              current_user)
 from . import auth
 from .forms import (LoginForm, RegistrationForm, ChangePasswordForm,
-                    PasswordResetRequestForm, PasswordResetForm)
+                    PasswordResetRequestForm, PasswordResetForm,
+                    EmailChangeRequestForm)
 from ..models import User
 from ..decorators import admin_required
 from ..emails import send_mail
@@ -42,14 +43,14 @@ def register():
         db.session.add(u)
         db.session.commit()
 
-        send_mail(to=current_app._get_current_object().config['ADMIN_EMAIL'],
+        send_mail(to=current_app.config['ADMIN_EMAIL'],
                   subject='Nowy użytkownik się zarejestrował',
                   template='email/new_user',
                   username=u.username)
 
         flash('Konto zostało zarejestrowane. Zostaniesz powiadomiony/a o '
-              'potwierdzeniu przez administratora wiadomością malową. '
-              'Do aktywacji konta korzystanie z aplikacji nie będzie '
+              'potwierdzeniu przez administratora wiadomością mailową. '
+              'Do momentu aktywacji konta korzystanie z aplikacji nie będzie '
               'możliwe',
               'success')
         return redirect(url_for('auth.login'))
@@ -147,5 +148,31 @@ def password_reset(token):
                   'success')
             return redirect(url_for('auth.login'))
         else:
-            flash('Błędne żądanie')
+            flash('Nieprawidłowy lub przeterminowany link', 'danger')
     return render_template('auth/reset_password.html', form=form)
+
+
+@auth.route('/emial-change-request', methods=['GET', 'POST'])
+@login_required
+def email_change_request():
+    form = EmailChangeRequestForm()
+    if form.validate_on_submit():
+        token = current_user.generate_email_change_token(form.new_email.data)
+        send_mail(to=form.new_email.data, subject='Zmiana adresu email',
+                  template='email/email_change', user=current_user,
+                  token=token)
+        flash('Wiadomość z dalszymi instrukcjami została '
+              'wysłana na podany adres', 'info')
+        return redirect(url_for('main.index'))
+    return render_template('auth/email_change_request.html', form=form)
+
+
+@auth.route('/email-change-confirm/<token>')
+@login_required
+def confirm_email_change(token):
+    if current_user.confirm_email_change_token(token):
+        flash('Twój email został poprawnie zmieniony.', 'success')
+    else:
+        flash("Nieprawidłowy lub przeterminowany link potwierdzający",
+              "danger")
+    return redirect(url_for('main.index'))

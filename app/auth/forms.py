@@ -88,3 +88,25 @@ class PasswordResetForm(Form):
     confirm_password = PasswordField('Potwierdź nowe hasło',
                                      validators=[DataRequired()])
     submit = SubmitField('Zmień hasło')
+
+
+class EmailChangeRequestForm(Form):
+    old_email = StringField('Stary email', validators=[DataRequired(), Email(),
+                                                       Length(1, 128)])
+    new_email = StringField('Nowy email', validators=[
+        DataRequired(), Email(), Length(1, 128),
+        EqualTo('confirm_email', message='Adresy muszą być takie same')])
+    confirm_email = StringField('Potwierdź nowy email',
+                                validators=[DataRequired(), Email(),
+                                            Length(1, 128)])
+    submit = SubmitField('Zmień email')
+
+    def validate_old_email(self, field):
+        if field.data != current_user.email:
+            raise ValidationError('Wpisano błędny adres')
+
+    def validate_new_email(self, field):
+        if field.data == current_user.email:
+            raise ValidationError('Nowy adres powinien różnić się od starego')
+        elif User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email przypisany do innego konta')

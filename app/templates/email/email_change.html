@@ -1,0 +1,11 @@
+<p>Drogi {{ user.username }}</p>
+<p>Otrzymano żądanie zmiany adresu email przypisanego do Twojego konta</p>
+<p>
+    Jeśli nie wysyłałeś takiego żądania lub konto o loginie {{ user.username }} nie należy do Ciebie,
+    zignoruj tę wiadomość
+</p>
+<p>By zmienić przypisany do konta adres email, skorzystaj z poniższego linku potwierdzającego</p>
+<p><a href="{{ url_for('auth.confirm_email_change', token=token, _external=True) }}">Link</a></p>
+<p>Pozdrawiam,</p>
+<p>Administracja NSI-StockTrackr</p>
+<p>Uwaga: Wiadomość wygenerowana automatycznie. Odpowiedzi nie będą monitorowane.</p>
