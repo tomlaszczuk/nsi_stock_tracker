@@ -3,7 +3,8 @@ from flask import (render_template, redirect, url_for,
 from flask.ext.login import (login_required, login_user, logout_user,
                              current_user)
 from . import auth
-from .forms import LoginForm, RegistrationForm
+from .forms import (LoginForm, RegistrationForm, ChangePasswordForm,
+                    PasswordResetRequestForm, PasswordResetForm)
 from ..models import User
 from ..decorators import admin_required
 from ..emails import send_mail
@@ -106,3 +107,45 @@ def unconfirmed():
         return redirect(url_for('main.index'))
     admin = current_app.config['ADMIN_EMAIL']
     return render_template('auth/unconfirmed_message.html', admin=admin)
+
+
+@auth.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        current_user.password = form.new_password.data
+        db.session.add(current_user)
+        flash('Hasło zmienione.', 'success')
+        return redirect(url_for('main.index'))
+    return render_template('auth/change_password.html', form=form)
+
+
+@auth.route('/password-reset-request', methods=['GET', 'POST'])
+def password_reset_request():
+    form = PasswordResetRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        token = user.generate_password_reset_token()
+        send_mail(to=form.email.data, subject='Reset hasła',
+                  template='email/password_reset',
+                  token=token, user=user)
+        flash('Wiadomość z dalszymi instrukcjami została '
+              'wysłana na podany adres', 'info')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/password_reset_request.html', form=form)
+
+
+@auth.route('/password-reset/<token>', methods=['GET', 'POST'])
+def password_reset(token):
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.confirm_password_reset_token(token,
+                                                      form.new_password.data):
+            flash('Sukces. Możesz się zalogować używając nowego hasła',
+                  'success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Błędne żądanie')
+    return render_template('auth/reset_password.html', form=form)

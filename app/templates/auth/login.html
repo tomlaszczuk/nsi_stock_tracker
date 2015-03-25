@@ -13,7 +13,8 @@
     	</div>
 	</div>
 	<div class="row">
-	    <p><a href="#">Nie pamiętasz hasła?</a> | <a href="{{ url_for('auth.register') }}">Nie masz konta?</a></p>
-	    <p>{{ env }}</p>
+	    <p>
+            <a href="{{ url_for('auth.password_reset_request') }}">Nie pamiętasz hasła?</a> | <a href="{{ url_for('auth.register') }}">Nie masz konta?</a>
+        </p>
 	</div
 {% endblock %}

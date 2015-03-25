@@ -1,3 +1,4 @@
+from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms import ValidationError
@@ -46,3 +47,44 @@ class RegistrationForm(Form):
             raise ValidationError(
                 'Ten login jest już przypisany do inengo konta'
             )
+
+
+class ChangePasswordForm(Form):
+    old_password = PasswordField('Stare hasło', validators=[DataRequired()])
+    new_password = PasswordField('Nowe hasło', validators=[
+        DataRequired(), EqualTo('confirm_password',
+                                message='Hasła muszą być takie same.')
+    ])
+    confirm_password = PasswordField('Potwierdź nowe hasło',
+                                     validators=[DataRequired()])
+    submit = SubmitField('Zmień')
+
+    def validate_old_password(self, field):
+        if not current_user.verify_password(field.data):
+            raise ValidationError('Błędne hasło.')
+
+    def validate_new_password(self, field):
+        if current_user.verify_password(field.data):
+            raise ValidationError('Nowe hasło powinno być inne niż stare')
+
+
+class PasswordResetRequestForm(Form):
+    email = StringField('Email', validators=[DataRequired(), Email(),
+                                             Length(1, 128)])
+    submit = SubmitField('Potwierdź')
+
+    def validate_email(self, field):
+        if not User.query.filter_by(email=field.data).first():
+            raise ValidationError('Brak konta powiązanego z podanym adresem')
+
+
+class PasswordResetForm(Form):
+    email = StringField('Email', validators=[DataRequired(), Email(),
+                                             Length(1, 128)])
+    new_password = PasswordField('Nowe hasło', validators=[
+        DataRequired(), EqualTo('confirm_password',
+                                message='Hasła muszą być takie same')
+    ])
+    confirm_password = PasswordField('Potwierdź nowe hasło',
+                                     validators=[DataRequired()])
+    submit = SubmitField('Zmień hasło')
